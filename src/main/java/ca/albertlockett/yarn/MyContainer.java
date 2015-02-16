@@ -17,6 +17,9 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.albertlockett.Complex;
+import ca.albertlockett.Fft;
+
 public class MyContainer {
 
 	private static final Logger log = 
@@ -38,15 +41,13 @@ public class MyContainer {
 		
 		this.inputFile = new Path(args[0]);
 		this.outputFile = new Path(args[1]);
-		this.start = Long.parseLong(args[3]);
-		this.length = Integer.parseInt(args[4]);
+		this.start = Long.parseLong(args[2]);
+		this.length = Integer.parseInt(args[3]);
 		
 	}
 	
 	
 	public void run() throws IOException {
-		
-		List<String> lines = new ArrayList<String>();
 		
 		log.info("Running container on {}", this.hostname);
 		
@@ -67,9 +68,33 @@ public class MyContainer {
 		log.info("Reading {} from {} to {}", inputFile.toString(), start, 
 				start + length);
 
+		// Create the signal from input
+		List<Complex> signal = new ArrayList<Complex>();
+		long bytesRead = 0;
+		String current = "";
+		while(bytesRead < this.length &&
+				(current = reader.readLine()) != null) {
+			Integer sample = Integer.parseInt(current);
+			signal.add(new Complex(sample));
+		}
 		
-		// Write output
-		writer.write("HELLO WORLD");
+		// process signal - In chunks of sampling rate
+		// TODO: Add actual sampling rate as arguement
+		Fft fft = new Fft();
+		int sampling_rate = 44100;
+
+		
+		Complex[] fft_sig = new Complex[signal.size()];
+		for( int i=0; i < signal.size(); i++ ) {
+			fft_sig[i] = signal.get(i);
+		}
+		fft_sig = fft.fft(fft_sig);
+		
+		for( Complex c : fft_sig ) {
+			writer.append(c.toString());
+			writer.append(",");
+		}
+		
 		
 		// close IO
 		reader.close();

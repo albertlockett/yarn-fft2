@@ -75,7 +75,7 @@ public class RMCallbackHandler implements CallbackHandler {
 
 	public void onContainersCompleted(List<ContainerStatus> statuses) {
 		
-		log.info("Got a response from RM container ask, complated = {}");
+		log.info("Containe completed ... ");
 		
 		for(ContainerStatus status : statuses) {
 			applicationMaster.getNumcompletedContainers().incrementAndGet();

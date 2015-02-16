@@ -67,6 +67,8 @@ public class AppClient {
 	
 	public boolean run() throws YarnException, IOException {
 		
+		log.info("STARTING APPLICATION ---");
+		
 		// Create Application
 		GetNewApplicationResponse appResponse = 
 				this.yarnClient.createApplication().getNewApplicationResponse();
@@ -137,6 +139,8 @@ public class AppClient {
 		classPathEnv.append(File.pathSeparatorChar);
 		classPathEnv.append(Environment.CLASSPATH.$());
 		env.put("CLASSPATH", classPathEnv.toString());
+		log.info("CLASSPATH variable set to {}", classPathEnv.toString());
+		
 		
 		// Configure the application context
 		YarnClientApplication app = this.yarnClient.createApplication();
@@ -156,8 +160,8 @@ public class AppClient {
 		Vector<CharSequence> vargs = new Vector<CharSequence>(30);
 		vargs.add(Environment.JAVA_HOME.$() + "/bin/java");
 		vargs.add("ca.albertlockett.yarn.ApplicationMaster");
-		vargs.add("1><LOG_DIR>/AppClient.stdout");
-		vargs.add("2><LOG_DIR>/AppClient.stderr");
+		//vargs.add("1><LOG_DIR>/AppClient.stdout");
+		//vargs.add("2><LOG_DIR>/AppClient.stderr");
 		vargs.add(this.inputPath.toString());
 		vargs.add(this.outputPath.toString());
 		

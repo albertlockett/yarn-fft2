@@ -37,7 +37,7 @@ public class ApplicationMaster {
 	private FileSystem fileSystem;
 	private Path inputFile;
 	private Path outputFile;
-	private List<BlockStatus> blockList = new ArrayList<BlockStatus>();
+	private List<BlockLocation> blockList = new ArrayList<BlockLocation>();
 	private RMCallbackHandler rmCallbackHandler;
 	private NMCallbackHandler containerListener;
 	private Integer numOfContainers = new Integer(0);
@@ -59,7 +59,7 @@ public class ApplicationMaster {
 	public Path getOutputFile() {
 		return this.outputFile;
 	}
-	public List<BlockStatus> getBlockList() {
+	public List<BlockLocation> getBlockList() {
 		return this.blockList;
 	}
 	public Integer getNumOfContainers() {
@@ -124,11 +124,13 @@ public class ApplicationMaster {
 		priority.setPriority(0);
 		
 		BlockLocation[] blocks = this.getBlockLocations();
-		for(BlockLocation block : blocks) {
+		for(BlockLocation block : blocks) { blockList.add(block); }
+		log.info("Number of blocks to process = {}", blockList.size());
+		
+		for(BlockLocation block : blockList) {
 			ContainerRequest ask = new ContainerRequest(capacity, 
 					block.getHosts(), null, priority);
 			this.amRmClient.addContainerRequest(ask);
-			this.blockList.add(new BlockStatus(block));
 			this.numOfContainers++;
 			log.info("Requesting container for block {}", block.toString());
 		}
